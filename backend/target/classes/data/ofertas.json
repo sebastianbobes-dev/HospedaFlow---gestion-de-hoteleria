@@ -1,0 +1,35 @@
+[
+  {
+    "id": "oft-001",
+    "titulo": "Escapada de Fin de Semana",
+    "descripcion": "Disfruta de un 15% de descuento en reservas de viernes a domingo en cualquier habitación.",
+    "codigo": "ESCAPADA15",
+    "porcentajeDescuento": 15,
+    "fechaInicio": "2026-01-01",
+    "fechaFin": "2026-12-31",
+    "habitacionTipo": "Todas",
+    "activa": true
+  },
+  {
+    "id": "oft-002",
+    "titulo": "Temporada Colonial Relax",
+    "descripcion": "20% de descuento en estancias de 2 o más noches para recargar energías entre semana.",
+    "codigo": "RELAX20",
+    "porcentajeDescuento": 20,
+    "fechaInicio": "2026-01-01",
+    "fechaFin": "2026-12-31",
+    "habitacionTipo": "Todas",
+    "activa": true
+  },
+  {
+    "id": "oft-003",
+    "titulo": "Promoción Suites de Lujo",
+    "descripcion": "Descuento exclusivo del 25% reservando cualquiera de nuestras Suites Coloniales con balcón.",
+    "codigo": "SUITE25",
+    "porcentajeDescuento": 25,
+    "fechaInicio": "2026-01-01",
+    "fechaFin": "2026-12-31",
+    "habitacionTipo": "Suite Colonial",
+    "activa": true
+  }
+]

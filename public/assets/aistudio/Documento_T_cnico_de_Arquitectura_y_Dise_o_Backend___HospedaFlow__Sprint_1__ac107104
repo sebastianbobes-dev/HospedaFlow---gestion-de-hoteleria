@@ -1,0 +1,216 @@
+﻿segDOCUMENTO TÉCNICO DE ARQUITECTURA Y DISEÑO BACKEND – HOSPEDAFLOW (SPRINT 1)
+1. Introducción y Objetivos del Sistema
+HospedaFlow es un sistema de gestión gerencial diseñado específicamente para hoteles pequeños y medianos. Su meta principal es automatizar los procesos operativos y administrativos más esenciales (como reservas, asignación de habitaciones, control de ofertas y gestión de perfiles de usuario) sin perder la atención personalizada que caracteriza a este tipo de alojamientos. Este documento detalla la estructura de clases del backend para el Sprint 1, sirviendo como guía maestra de desarrollo para el equipo técnico.
+2. Lineamientos Arquitectónicos y Tecnológicos
+El desarrollo del backend se fundamenta en rigurosas prácticas de ingeniería de software para garantizar un código limpio, mantenible y escalable:
+
+
+* Lenguaje y Paradigma: Desarrollado íntegramente en Java, aplicando los principios de la Programación Orientada a Objetos (POO), herencia, encapsulamiento y polimorfismo.
+* Framework Base: Utilización de Spring Boot, aprovechando su ecosistema para la inyección de dependencias, control de flujo MVC y anotaciones estructuradas.
+* Patrón Arquitectónico: Separación estricta bajo el modelo MVC (Modelo-Vista-Controlador), aislando la lógica de negocio (Servicios), la persistencia (Repositorios/DAO) y las estructuras de datos (Entidades).
+* Persistencia Ligera en JSON: Debido a la escala del proyecto universitario, se omite el uso de bases de datos relacionales pesadas, implementando un sistema de persistencia basado en archivos JSON locales gestionados mediante clases serializadoras dedicadas.
+3. Desglose del Diagrama de Clases del Backend
+El diseño se divide claramente en cuatro capas lógicas: Utilidades de Base de Datos, Repositorios (JSON), Servicios (Lógica de Negocio) y Modelos de Entidad junto a sus Enumeraciones.
+3.1. Capa de Persistencia y Utilidades JSON
+* JsonDatabase: Clase central de utilidad encargada de la serialización y deserialización de listas de objetos hacia archivos planos en disco. Contiene métodos genéricos como guardarLista(String rutaArchivo, List<T> lista) y leerLista(String rutaArchivo, TypeReference<List<T>> tipo).
+* HabitacionJsonRepository: Repositorio específico que gestiona el archivo habitaciones.json, implementando métodos para obtener todas las habitaciones, guardar registros individuales y eliminar por identificador.
+* ReservaJsonRepository: Encargado de la lectura, escritura y actualización sobre el archivo de reservas (reservas.json).
+* UsuarioJsonRepository: Administra la persistencia de los perfiles de usuario en formato JSON, permitiendo consultas generales, guardado y eliminación.
+3.2. Capa de Servicios (Lógica de Negocio)
+* HabitacionService: Centraliza los casos de uso relacionados con la creación, eliminación y validación de disponibilidad de habitaciones.
+* ReservaService: Orquesta las operaciones críticas del Sprint 1, tales como registrar reservas, modificar fechas, cancelar reservas, confirmarlas y asignar habitaciones específicas.
+* OfertaService: Administra el ciclo de vida de las ofertas comerciales (creación, modificación y eliminación).
+* PerfilService: Maneja la lógica detrás de la creación de perfiles generales y de huéspedes, asignación de roles y consulta de usuarios.
+3.3. Capa de Entidades y Modelo de Dominio
+* Usuario (Clase Abstracta): Define los atributos comunes de identidad (id, nombre, email, password, telefono, rol) y el método de autenticación. De ella extienden conceptualmente los roles operativos.
+* Actores / Roles: Clases asociadas o especializadas para Gerente (Administrador), Recepcionista y Huésped, interactuando con los servicios correspondientes.
+* Habitacion: Modela las características físicas y operativas de los espacios (id, numero, tipo, precioBase, capacidad, estado), incluyendo métodos como cambiarEstado() y esDisponible().
+* Oferta: Representa promociones comerciales vinculadas a habitaciones, con atributos de vigencia, porcentajes de descuento y fechas de validez.
+* Reserva: Entidad central que une al huésped, la habitación asignada y la oferta aplicada, soportando métodos de negocio locales como confirmar(), cancelar(), modificarFechas() y asignarHabitacion().
+3.4. Enumeraciones de Apoyo
+Enumeración
+	Valores Permitidos
+	Descripción / Propósito
+	RolUsuario
+	Admin, Recepcionista, Huesped
+	Define los niveles de acceso y permisos dentro del sistema.
+	EstadoHabitacion
+	Disponible, Ocupada, Mantenimiento
+	Controla la disponibilidad operativa actual del espacio físico.
+	EstadoReserva
+	Pendiente, Confirmada, Cancelada
+	Monitorea la fase del ciclo de vida en que se encuentra la reserva.
+	4. Nota de Lineamiento y Aclaración para el Equipo
+Importante para el equipo de desarrollo: Todo el diseño presentado en este documento y reflejado en el diagrama de clases constituye la idea base y la estructura estructural mínima necesaria para cumplir exitosamente con los objetivos del Sprint 1.
+Si durante el proceso de codificación en Java y Spring Boot algún desarrollador identifica la necesidad de incorporar atributos adicionales, métodos auxiliares de validación o constructores específicos para optimizar el rendimiento o la legibilidad del código, tiene total libertad de agregarlos. No obstante, la arquitectura modular, las interfaces de servicio y la separación en capas descritas aquí deben mantenerse strictly intactas para garantizar la cohesión del proyecto.
+4.1. Diagrama de Clases del Backend
+(Se adjunta a continuación la estructura general de clases base para el backend de HospedaFlow)
+  
+Nota aclaratoria: En este diagrama de clases base del backend están representadas las Entidades, los Servicios y los Repositorios JSON. No están incorporadas las clases RestController ni los DTO, los cuales se detallan por separado en la Sección 5.
+
+
+hospedaflow/
+│
+├── backend/                            <-- PROYECTO JAVA / SPRING BOOT
+│   └── src/
+│       └── main/
+│           ├── java/
+│           │   └── com/
+│           │       └── hospedaflow/
+│           │           ├── HospedaFlowApplication.java
+│           │           │
+│           │           ├── controller/           <-- (Capa C - Controllers REST)
+│           │           │   ├── HabitacionRestController.java
+│           │           │   ├── ReservaRestController.java
+│           │           │   ├── OfertaRestController.java
+│           │           │   └── PerfilRestController.java
+│           │           │
+│           │           ├── dto/                  <-- (Objetos de Transferencia Web)
+│           │           │   ├── HabitacionRequestDTO.java
+│           │           │   ├── ReservaRequestDTO.java
+│           │           │   ├── OfertaRequestDTO.java
+│           │           │   └── UsuarioRequestDTO.java
+│           │           │
+│           │           ├── service/              <-- (Lógica de Negocio)
+│           │           │   ├── HabitacionService.java
+│           │           │   ├── ReservaService.java
+│           │           │   ├── OfertaService.java
+│           │           │   └── PerfilService.java
+│           │           │
+│           │           ├── repository/           <-- (Capa de Persistencia DAO JSON)
+│           │           │   ├── HabitacionJsonRepository.java
+│           │           │   ├── ReservaJsonRepository.java
+│           │           │   ├── OfertaJsonRepository.java
+│           │           │   └── UsuarioJsonRepository.java
+│           │           │
+│           │           ├── model/                <-- (Capa M - Entidades del Dominio)
+│           │           │   ├── entity/
+│           │           │   │   ├── Usuario.java (Abstracta)
+│           │           │   │   ├── Gerente.java
+│           │           │   │   ├── Recepcionista.java
+│           │           │   │   ├── Huesped.java
+│           │           │   │   ├── Habitacion.java
+│           │           │   │   ├── Reserva.java
+│           │           │   │   └── Oferta.java
+│           │           │   └── enums/
+│           │           │       ├── RolUsuario.java
+│           │           │       ├── EstadoHabitacion.java
+│           │           │       └── EstadoReserva.java
+│           │           │
+│           │           └── util/                 <-- (Motor de Persistencia Plano)
+│           │               └── JsonDatabase.java
+│           │
+│           └── resources/                        <-- (Base de Datos Local JSON)
+│               ├── data/
+│               │   ├── habitaciones.json
+│               │   ├── reservas.json
+│               │   ├── ofertas.json
+│               │   └── usuarios.json
+│               └── application.properties
+│
+└── frontend/                           <-- CLIENTE WEB (Capa V - Vista)
+    ├── css/                            <-- Estilos globales e interactivos
+    │   └── estilos.css
+    │
+    ├── js/                             <-- Controladores del cliente (Vanilla JS + fetch)
+    │   ├── habitaciones.js
+    │   ├── reservas.js
+    │   ├── ofertas.js
+    │   └── perfiles.js
+    │
+    └── views/                          <-- Plantillas / Vistas HTML5
+        ├── index.html                  <-- Inicio / Login y Selección de Rol
+        ├── habitaciones.html           <-- Gestión de Habitaciones (Admin)
+        ├── reservas.html               <-- Registro y Consulta de Reservas
+        └── ofertas.html                <-- Promociones y Descuentos
+
+
+5. Arquitectura del Frontend y Comunicación con el Backend
+5.1. Tecnologías y Estructura del Frontend
+El desarrollo de la interfaz de usuario se basará en una pila web ligera, eficiente y estándar, utilizando HTML5, CSS3 y JavaScript puro (Vanilla JS) complementado con Bootstrap para acelerar el diseño visual.
+* Ubicación en el proyecto:
+   * src/main/resources/templates/: Páginas HTML del sistema (index.html, habitaciones.html, reservas.html, ofertas.html).
+   * src/main/resources/static/css/: Hojas de estilo personalizadas (estilos.css).
+   * src/main/resources/static/js/: Archivos de lógica JavaScript desacoplados por módulo (habitaciones.js, reservas.js, ofertas.js).
+5.2. Patrón de Comunicación Asíncrona (REST + DTO + Fetch API)
+La comunicación entre el Frontend (JavaScript) y el Backend (Java / Spring Boot) se realiza mediante peticiones HTTP asíncronas sin recargar la página:
+* Controladores REST (@RestController): Exponen endpoints HTTP (/api/reservas, /api/habitaciones, etc.) y responden exclusivamente con datos en formato JSON.
+* Clases DTO (Data Transfer Objects): Objetos de transferencia planos (ReservaRequestDTO, HabitacionRequestDTO, OfertaRequestDTO, UsuarioRequestDTO) que reciben y envían datos de forma segura, protegiendo las entidades internas de la base de datos y evitando bucles de serialización JSON.
+* Peticiones fetch con async/await: Los scripts en JavaScript consumen los controladores REST mediante la API nativa fetch, enviando paquetes JSON en el cuerpo (body) y actualizando dinámicamente el DOM de HTML.
+5.3. Clases DTO y REST Controllers a Agregar en el Backend
+* ReservaRestController & ReservaRequestDTO: Gestión asíncrona de creación, consulta, actualización de fechas y cancelación de reservas.
+* HabitacionRestController & HabitacionRequestDTO: Registro y consulta de disponibilidad de habitaciones.
+* OfertaRestController & OfertaRequestDTO: Administración de promociones y descuentos.
+* PerfilRestController & UsuarioRequestDTO: Gestión de perfiles de usuario y asignación de roles.
+
+
+Pautas de desarrollo
+6.1. Lineamientos Generales de Integración
+   * Control de Versiones (Git): Trabajo en ramas funcionales (feature/persistencia, feature/servicios, feature/rest, feature/frontend) con Pull Requests revisados antes de integrar a develop.
+   * Separación de Capas (SOLID): Respeto estricto de responsabilidades por capa (el controlador no ejecuta lógica de negocio, el servicio no maneja HTTP y el DTO no contiene persistencia).
+6.2. Desarrollador 1: Capa de Modelos y Persistencia JSON
+   * Rol: Backend Storage & Domain Developer
+   * Rama: feature/persistencia
+User Stories
+   * US-1.1: Mapeo de Entidades y Enumeraciones de Dominio
+   * Como: Desarrollador del sistema
+   * Quiero: Implementar las clases de entidad (Usuario abstracta, Gerente, Recepcionista, Huesped, Habitacion, Reserva, Oferta) y enumeraciones (RolUsuario, EstadoHabitacion, EstadoReserva)
+   * Para: Representar las estructuras fundamentales de información en memoria.
+   * Criterios de Aceptación: Atributos encapsulados, sin anotaciones relacionales (@Entity), e implementación correcta de herencia.
+   * US-1.2: Motor de Serialización/Deserialización Genérico
+   * Como: Desarrollador del backend
+   * Quiero: Crear la clase de utilidad JsonDatabase
+   * Para: Leer y escribir listas de objetos genéricos en archivos físicos planos.
+   * Criterios de Aceptación: Uso de Jackson (ObjectMapper, TypeReference), métodos guardarLista y leerLista, y manejo de excepciones I/O.
+   * US-1.3: Implementación de Repositorios JSON (DAOs)
+   * Como: Desarrollador del backend
+   * Quiero: Implementar HabitacionJsonRepository, ReservaJsonRepository, UsuarioJsonRepository y OfertaJsonRepository
+   * Para: Aislar el acceso directo a los archivos .json locales.
+   * Criterios de Aceptación: Métodos de CRUD básico por entidad y persistencia inmediata en disco.
+6.3. Desarrollador 2: Capa de Servicios (Lógica de Negocio)
+   * Rol: Backend Core Logic Developer
+   * Rama: feature/servicios
+User Stories
+   * US-2.1: Gestión Operativa de Habitaciones (HabitacionService)
+   * Como: Administrador o recepcionista
+   * Quiero: Consultar la disponibilidad y estado de las habitaciones
+   * Para: Garantizar una asignación correcta durante las reservaciones.
+   * Criterios de Aceptación: Métodos crearHabitacion(), eliminarHabitacion(), consultarDisponibilidad() y validación de duplicados.
+   * US-2.2: Ciclo de Vida de Reservaciones (ReservaService)
+   * Como: Recepcionista del hotel
+   * Quiero: Registrar, modificar, confirmar y cancelar reservas
+   * Para: Administrar la estancia de los huéspedes en el Sprint 1.
+   * Criterios de Aceptación: Validar rango de fechas, disponibilidad real, cambio de estado de reserva y cálculo de tarifas.
+   * US-2.3: Administración de Ofertas y Perfiles (OfertaService & PerfilService)
+   * Como: Administrador del sistema
+   * Quiero: Gestionar ofertas promocionales y perfiles de usuario
+   * Para: Controlar descuentos y definir accesos.
+   * Criterios de Aceptación: Lógica de vigencia de ofertas y gestión de roles.
+6.4. Desarrollador 3: Capa de Controladores REST y DTOs
+   * Rol: API & Middleware Developer
+   * Rama: feature/rest
+User Stories
+   * US-3.1: Definición de Data Transfer Objects (DTOs)
+   * Como: Desarrollador de la API
+   * Quiero: Crear ReservaRequestDTO, HabitacionRequestDTO, OfertaRequestDTO y UsuarioRequestDTO
+   * Para: Desacoplar los datos recibidos de la web de las entidades internas.
+   * Criterios de Aceptación: Estructuras planas sin dependencias a repositorios ni entidades.
+   * US-3.2: Exposición de Endpoints REST (@RestController)
+   * Como: Cliente frontend (JavaScript)
+   * Quiero: Consumir endpoints HTTP bien definidos
+   * Para: Enviar y recibir datos en formato JSON de manera asíncrona.
+   * Criterios de Aceptación: Endpoints /api/*, códigos de estado HTTP estándar (200 OK, 201 Created, 400 Bad Request), inyección con @Autowired y pruebas validadas.
+6.5. Desarrollador 4: Capa Frontend (Vistas HTML, CSS y JS)
+   * Rol: UI/UX & Asynchronous Frontend Developer
+   * Rama: feature/frontend
+User Stories
+   * US-4.1: Maquetación de Interfaces de Usuario (HTML5 + Bootstrap)
+   * Como: Usuario del sistema (Recepcionista / Administrador)
+   * Quiero: Contar con pantallas limpias e intuitivas
+   * Para: Operar la gestión del hotel sin complicaciones.
+   * Criterios de Aceptación: Vistas en templates/, uso de Bootstrap 5 e identificadores id explícitos.
+   * US-4.2: Integración Asíncrona con el Backend (fetch API)
+   * Como: Usuario de HospedaFlow
+   * Quiero: Guardar y consultar información sin recargar la página
+   * Para: Disfrutar de una experiencia fluida e instantánea.
+   * Criterios de Aceptación: Archivos .js independientes, uso de async/await y fetch(), envío de encabezados 'Content-Type': 'application/json' y manejo de alertas dinámicas.

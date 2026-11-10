@@ -1,0 +1,6 @@
+{
+  "name": "HospedaFlow - Gestión Hotelera",
+  "description": "Sistema de gestión gerencial y operativo para hoteles pequeños y medianos. Control de reservas, asignación de habitaciones, ofertas y perfiles.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
